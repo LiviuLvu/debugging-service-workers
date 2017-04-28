@@ -15,10 +15,10 @@
 var CACHE_NAME = 'my-site-cache-v1';
 var urlsToCache = [
   '/',
-  '/styles/main.js',
+  '/styles/main.css',
   '/scripts/main.js',
   '/images/smiley.svg'
-]
+];
 
 self.addEventListener('install', function(event) {
   // Install steps
@@ -33,4 +33,29 @@ self.addEventListener('install', function(event) {
 
 self.addEventListener('activate', function(event) {
   console.log('Service Worker 1 activating.');
+});
+
+self.addEventListener('fetch', function (event) {
+  event.respondWith(
+    caches.match(event.request)
+      .then(function (response) {
+        if (response) {
+          return response;
+        }
+        return fetch(event.request);
+      }));
+});
+
+self.addEventListener('push', function (event) {
+  var title = 'yay message';
+  var body = 'Received push message';
+  var icon = '/images/smiley.svg';
+  var tag = 'simple-push-example-tag';
+  event.waitUntil(
+    self.registration.showNotification(title, {
+      body: body,
+      icon: icon,
+      tag: tag
+    })
+  );
 });
